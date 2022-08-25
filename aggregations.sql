@@ -360,4 +360,69 @@ FROM accounts AS a
 JOIN web_events AS w ON a.id = w.account_id
 GROUP BY a.id, a.name, w.channel
 ORDER BY occurrences DESC
-LIMIT 1;
+LIMIT 10;
+
+
+-- Find the sales in terms of total dollars for all orders in each year, ordered from greatest to least.
+-- Do you notice any trends in the yearly sales totals?
+SELECT
+    EXTRACT(YEAR FROM o.occurred_at) AS year,
+    CAST(SUM(o.total_amt_usd) AS MONEY) AS total_sales
+FROM orders AS o
+GROUP BY EXTRACT(YEAR FROM o.occurred_at)
+ORDER BY EXTRACT(YEAR FROM o.occurred_at) DESC;
+
+
+-- Which month did Parch & Posey have the greatest sales in terms of total dollars?
+-- Are all months evenly represented by the dataset?
+SELECT
+    EXTRACT(MONTH FROM o.occurred_at) AS MONTH,
+    -- DATE_PART('month',  o.occurred_at) AS month, | this works too
+    CAST(SUM(o.total_amt_usd) AS MONEY) AS total_sales
+FROM orders AS o
+GROUP BY EXTRACT(MONTH FROM o.occurred_at)
+ORDER BY EXTRACT(MONTH FROM o.occurred_at) DESC;
+
+
+-- Which year did Parch & Posey have the greatest sales in terms of total number of orders?
+-- Are all years evenly represented by the dataset?
+SELECT
+    EXTRACT(YEAR FROM o.occurred_at) AS year,
+    SUM(o.total) AS total_qty_sold
+FROM orders AS o
+GROUP BY EXTRACT(YEAR FROM o.occurred_at)
+ORDER BY EXTRACT(YEAR FROM o.occurred_at) DESC;
+
+-- Which month did Parch & Posey have the greatest sales in terms of total number of orders?
+-- Are all months evenly represented by the dataset?
+SELECT
+    EXTRACT(MONTH FROM o.occurred_at) AS MONTH,
+    SUM(o.total) AS total_qty_sold
+FROM orders AS o
+GROUP BY EXTRACT(MONTH FROM o.occurred_at)
+ORDER BY EXTRACT(MONTH FROM o.occurred_at) DESC;
+
+-- In which month of which year did Walmart spend the most on gloss paper in terms of dollars?
+SELECT
+    EXTRACT(MONTH FROM o.occurred_at) AS MONTH,
+    EXTRACT(YEAR FROM o.occurred_at) AS year,
+    SUM(o.gloss_amt_usd) AS gloss_usd_spent
+FROM orders AS o
+JOIN accounts AS a ON a.id = o.account_id
+WHERE a.name LIKE 'Walmart'
+GROUP BY EXTRACT(MONTH FROM o.occurred_at), EXTRACT(YEAR FROM o.occurred_at)
+ORDER BY SUM(o.gloss_amt_usd) DESC;
+
+
+-- Create a column that divides the standard_amt_usd by the standard_qty to find the unit price for standard
+-- paper for each order. Limit the results to the first 10 orders, and include the id and account_id fields.
+-- NOTE - you will be thrown an error with the correct solution to this question. This is for a division by zero.
+-- You will learn how to get a solution without an error to this query when you learn about CASE statements in a later section.
+-- Now, let's use a CASE statement. This way any time the standard_qty is zero, we will return 0, and otherwise we will return the unit_price.
+SELECT
+    account_id,
+    CASE
+    WHEN standard_qty = 0 OR standard_qty IS NULL THEN 0
+        ELSE standard_amt_usd/standard_qty END AS unit_price
+FROM orders
+LIMIT 10;
