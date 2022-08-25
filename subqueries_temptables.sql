@@ -1,0 +1,3 @@
+-- We want to find the average number of events for each day for each channel. The first table
+-- will provide us the number of events for each day and channel, and then we will need to
+-- average these values together using a second query.
