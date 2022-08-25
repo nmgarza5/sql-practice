@@ -217,3 +217,147 @@ JOIN sales_reps AS s ON s.id = a.sales_rep_id
 JOIN region AS r ON r.id = s.region_id
 GROUP BY r.name, w.channel
 ORDER BY occurrences DESC;
+
+
+-- Use DISTINCT to test if there are any accounts associated with more than one region.
+SELECT DISTINCT
+    a.id AS "account_id",
+    r.id AS "region_id",
+    a.name,
+    r.name
+FROM accounts AS a
+JOIN sales_reps AS s ON s.id = a.sales_rep_id
+JOIN region AS r ON r.id = s.region_id;
+
+SELECT DISTINCT id, name
+FROM accounts;
+
+-- Have any sales reps worked on more than one account?
+SELECT s.id, s.name, COUNT(*) num_accounts
+FROM accounts a
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+GROUP BY s.id, s.name
+ORDER BY num_accounts;
+
+SELECT DISTINCT id, name
+FROM sales_reps;
+
+
+-- How many of the sales reps have more than 5 accounts that they manage?
+SELECT
+    s.id,
+    s.name,
+    COUNT(*) AS num_accounts
+FROM sales_reps AS s
+JOIN accounts AS a ON s.id = a.sales_rep_id
+GROUP BY s.id, s.name
+HAVING COUNT(*) > 5
+ORDER BY num_accounts;
+
+
+-- How many accounts have more than 20 orders?
+SELECT
+    a.id,
+    a.name,
+    COUNT(*) AS num_orders
+FROM accounts AS a
+JOIN orders AS o ON o.account_id = a.id
+GROUP BY a.id, a.name
+HAVING COUNT(*) > 20
+ORDER BY num_orders;
+
+
+-- Which account has the most orders?
+SELECT
+    a.id,
+    a.name,
+    COUNT(*) AS num_orders
+FROM accounts AS a
+JOIN orders AS o ON o.account_id = a.id
+GROUP BY a.id, a.name
+ORDER BY num_orders DESC
+LIMIT 1;
+
+-- Which accounts spent more than 30,000 usd total across all orders?
+SELECT
+    a.id AS account_id,
+    a.name,
+    CAST(SUM(o.total_amt_usd) AS MONEY) AS total_sales
+FROM accounts AS a
+JOIN orders AS o ON o.account_id = a.id
+GROUP BY a.id, a.name
+HAVING SUM(o.total_amt_usd) > 20000
+ORDER BY total_sales DESC
+LIMIT 10;
+
+-- Which accounts spent less than 1,000 usd total across all orders?
+SELECT
+    a.id AS account_id,
+    a.name,
+    CAST(SUM(o.total_amt_usd) AS MONEY) AS total_sales
+FROM accounts AS a
+JOIN orders AS o ON o.account_id = a.id
+GROUP BY a.id, a.name
+HAVING SUM(o.total_amt_usd) < 1000
+ORDER BY total_sales DESC
+LIMIT 10;
+
+-- Which account has spent the most with us?
+SELECT
+    a.id AS account_id,
+    a.name,
+    CAST(SUM(o.total_amt_usd) AS MONEY) AS total_sales
+FROM accounts AS a
+JOIN orders AS o ON o.account_id = a.id
+GROUP BY a.id, a.name
+ORDER BY total_sales DESC
+LIMIT 1;
+
+-- Which account has spent the least with us?
+SELECT
+    a.id AS account_id,
+    a.name,
+    CAST(SUM(o.total_amt_usd) AS MONEY) AS total_sales
+FROM accounts AS a
+JOIN orders AS o ON o.account_id = a.id
+GROUP BY a.id, a.name
+ORDER BY total_sales ASC
+LIMIT 1;
+
+-- Which accounts used facebook as a channel to contact customers more than 6 times?
+SELECT
+    a.id AS account_id,
+    a.name,
+    COUNT(*) AS occurrences
+FROM accounts AS a
+JOIN web_events AS w ON a.id = w.account_id
+GROUP BY a.id, a.name, w.channel
+HAVING w.channel = 'facebook' AND COUNT(*) > 6;
+
+-- Which account used facebook most as a channel?
+SELECT
+    a.id AS account_id,
+    a.name,
+    COUNT(*) AS occurrences
+FROM accounts AS a
+JOIN web_events AS w ON a.id = w.account_id
+-- ORDER BY w.channel = 'facebook' | this works too instead of HAVING
+GROUP BY a.id, a.name, w.channel
+HAVING w.channel = 'facebook'
+ORDER BY occurrences DESC
+LIMIT 1;
+-- Note: This query above only works if there are no ties for the account that used facebook the most. It is a best practice to use a larger
+-- limit number first such as 3 or 5 to see if there are ties before using LIMIT 1.
+
+-- Which channel was most frequently used by most accounts?
+SELECT
+    a.id AS account_id,
+    a.name,
+    w.channel,
+    COUNT(*) AS occurrences
+FROM accounts AS a
+JOIN web_events AS w ON a.id = w.account_id
+GROUP BY a.id, a.name, w.channel
+ORDER BY occurrences DESC
+LIMIT 1;
