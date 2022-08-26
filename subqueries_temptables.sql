@@ -333,6 +333,9 @@ ORDER BY 2 DESC;
 
 -- What is the lifetime average amount spent in terms of total_amt_usd, including only the
 -- companies that spent more per order, on average, than the average of all orders.
+
+-- subquery: return the names of all accounts and their avg_amt per order who on average
+-- spent more per order than the overall average
 WITH avg_order_accounts as
                         (SELECT
                             a.name,
@@ -340,14 +343,8 @@ WITH avg_order_accounts as
                         FROM accounts as a
                         JOIN orders as o ON o.account_id = a.id
                         GROUP BY 1
-                        HAVING AVG(o.total_amt_usd) > (SELECT
-                                AVG(total_amt_usd)
-                            FROM orders))
-                            -- subquery: average usd per order of all orders
-
+                        HAVING AVG(o.total_amt_usd) > (SELECT AVG(total_amt_usd) FROM orders))
 
 SELECT
     CAST(AVG(avg_amt) as MONEY) as lifetime_avg_spent
 FROM
-    -- subquery: return the names of all accounts and their avg_amt per order who on average
-    -- spent more per order than the overall average
