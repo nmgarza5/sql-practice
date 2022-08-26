@@ -347,4 +347,4 @@ WITH avg_order_accounts as
 
 SELECT
     CAST(AVG(avg_amt) as MONEY) as lifetime_avg_spent
-FROM
+FROM avg_order_accounts
