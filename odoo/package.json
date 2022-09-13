@@ -1,0 +1,29 @@
+{
+  "name": "odoo",
+  "version": "1.0.0",
+  "description": "odoo sql question",
+  "main": "pad-test.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/n/a.git"
+  },
+  "keywords": [
+    "n/a"
+  ],
+  "author": "nmgarza5",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/n/a/issues"
+  },
+  "homepage": "https://github.com/n/a#readme",
+  "dependencies": {
+    "faker": "^6.6.6",
+    "node-postgres": "^0.6.2"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^7.5.0"
+  }
+}

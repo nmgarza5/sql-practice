@@ -336,15 +336,15 @@ ORDER BY 2 DESC;
 
 -- subquery: return the names of all accounts and their avg_amt per order who on average
 -- spent more per order than the overall average
-WITH avg_order_accounts as
-                        (SELECT
-                            a.name,
-                            AVG(o.total_amt_usd) avg_amt
-                        FROM accounts as a
-                        JOIN orders as o ON o.account_id = a.id
-                        GROUP BY 1
-                        HAVING AVG(o.total_amt_usd) > (SELECT AVG(total_amt_usd) FROM orders))
+-- WITH avg_order_accounts as
+--                         (SELECT
+--                             a.name,
+--                             AVG(o.total_amt_usd) avg_amt
+--                         FROM accounts as a
+--                         JOIN orders as o ON o.account_id = a.id
+--                         GROUP BY 1
+--                         HAVING AVG(o.total_amt_usd) > (SELECT AVG(total_amt_usd) FROM orders))
 
-SELECT
-    CAST(AVG(avg_amt) as MONEY) as lifetime_avg_spent
-FROM avg_order_accounts
+-- SELECT
+--     CAST(AVG(avg_amt) as MONEY) as lifetime_avg_spent
+-- FROM avg_order_accounts
